@@ -202,4 +202,21 @@ def get_ip():
     return IP
 
 if __name__ == "__main__":
+    ip = get_ip()
+
+    print("\n" + "=" * 48)
+    print("          QWEN3STUDIO INICIADO")
+    print("=" * 48)
+    print("\nAcesso pelo computador:")
+    print("http://localhost:7860")
+
+    if ip != "127.0.0.1":
+        print("\nAcesso pelo celular (mesma rede Wi-Fi):")
+        print(f"http://{ip}:7860")
+    else:
+        print("\nNão foi possível detectar o IP da rede local.")
+
+    print("\nPara conectar, mantenha o servidor aberto.")
+    print("=" * 48 + "\n")
+
     uvicorn.run(app, host="0.0.0.0", port=7860, log_level="warning")

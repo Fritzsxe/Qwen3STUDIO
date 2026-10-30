@@ -1,0 +1,142 @@
+QWEN3-TTS LOCAL STUDIO
+FULL SYSTEM REVIEW
+========================================
+
+1. RESUMO EXECUTIVO
+O sistema é funcional em sua essência, mas apresenta falhas críticas de sincronização entre o estado do backend e a interface frontend. A direção visual é sólida, mas a implementação de algumas cenas (especialmente após a seleção de modo) estava incompleta ou com bugs de renderização (telas pretas).
+
+2. ESTRUTURA DO PROJETO
+O projeto segue uma estrutura modular com backend em Python (FastAPI + Wrapper customizado), runtime para gerenciamento de jobs asíncronos e frontend estático (HTML/JS/CSS).
+
+3. ARQUITETURA REAL
+Launcher (launcher.py) -> Server (main.py/FastAPI) -> Runtime (runtime.py) -> Backend (qwen3_tts_backend.py) -> GPU.
+A comunicação é feita via REST API para comandos e WebSocket para eventos de estado da GPU.
+
+4. BACKEND
+Baseado no qwen-tts 0.1.1. Estável para carregamento local e detecção de modelos no cache do Hugging Face.
+
+5. RUNTIME
+Gerencia uma fila de jobs (asyncio.Queue). Isolamento correto da GPU, permitindo apenas um job por vez.
+
+6. JOB SYSTEM
+Implementado com estados (QUEUED, PROCESSING, COMPLETED, FAILED). Agora integrado ao SQLite para persistência histórica.
+
+7. GPU / CUDA / VRAM
+Funcionando corretamente para GTX 1650. Identificado gargalo em FP16 (Assertion Error), resolvido com fallback para FP32 ou INT8 via bitsandbytes.
+
+8. MODEL LIFECYCLE
+Suporta carregamento dinâmico. Detecta automaticamente modelos no HF Cache.
+
+9. HUGGING FACE CACHE
+Totalmente integrado. O sistema prioriza snapshots apontados por refs/main.
+
+10. AUDIO PIPELINE
+WAV gerado pelo Qwen3-TTS (24kHz).
+
+11. FFMPEG
+Localizado em tools/ffmpeg/ffmpeg.exe. Funcional para conversão MP3 (64k CBR).
+
+12. PERSISTÊNCIA
+Implementada via SQLite (Backend) para histórico e localStorage (Frontend) para estado da UI.
+
+13. REST API
+Funcional. Endpoints principais: /api/status, /api/models, /api/generate/custom, /api/history.
+
+14. WEBSOCKET
+Existente, mas os nomes dos eventos estavam inconsistentes entre backend e frontend, causando falha na atualização de status.
+
+15. FRONTEND
+Identidade visual Obsidian/Titanium aplicada. Problemas de "tela preta" identificados em transições de cena.
+
+16. EXPERIENCE MODE
+Implementado como um sistema de etapas (Intro, Voice, Text, Generate). Motion typography/mograph adicionada.
+
+17. STUDIO MODE
+Interface de alta densidade funcional, mas necessitava de sincronização real com os speakers do modelo carregado.
+
+18. MOBILE MODE
+Responsivo. Suporta QR Code para conexão rápida via LAN.
+
+19. DESIGN SYSTEM
+Paleta de cores escuras, uso de backdrop-filter para glassmorphism e sombras profundas.
+
+20. ESTADO / PERSISTÊNCIA DO FRONTEND
+Persiste cena atual, texto e speaker via Persistence.js.
+
+21. COMUNICAÇÃO FRONTEND ↔ BACKEND
+PARCIAL. Falhas na interpretação de mensagens do WebSocket.
+
+22. TESTES EXECUTADOS
+- Carregamento de modelo 0.6B: OK
+- Geração de áudio via API: OK
+- Conversão MP3 via FFmpeg: OK
+- Persistência de texto: OK
+
+23. TESTES QUE FALHARAM
+- Auto-update de speakers no Studio sem modelo carregado: FALHOU (Corrigido com fallback).
+- Transição Experience -> Studio: FALHOU (Z-index/Opacity conflito).
+
+24. BUGS ENCONTRADOS
+
+BUG #001
+Nome: Tela Preta após Splash
+Arquivo: app.js / style.css
+Sintoma: Ao terminar o splash, a tela de seleção não aparecia.
+Causa: Conflito de classes .active e opacidade zero.
+Correção: Ajuste nas transições de CSS e prioridade de z-index.
+
+BUG #002
+Nome: Speakers Vazios no Studio
+Arquivo: studio.js
+Sintoma: O combo de vozes aparecia vazio se o modelo não estivesse pré-carregado.
+Causa: API /status retornava lista vazia antes do carregamento inicial.
+Correção: Implementado fallback para lista oficial de vozes do Qwen3.
+
+BUG #003
+Nome: Falha no deepcopy de dict_keys
+Arquivo: qwen3_tts_backend.py
+Sintoma: Erro "cannot pickle dict_keys".
+Causa: Incompatibilidade Python 3.12 + Transformers.
+Correção: Patch copy._deepcopy_dispatch aplicado no startup.
+
+25. CAUSA RAIZ DE CADA BUG
+Inconsistência entre o tempo de resposta das APIs e a expectativa de renderização do DOM no frontend.
+
+26. CORREÇÕES REALIZADAS
+- Sincronização de eventos WebSocket (Unificação de nomes e estrutura).
+- Unificação do sistema de transição de cenas (Removido conflito de opacidade).
+- Persistência de banco de dados SQLite para histórico.
+- Implementação de fallback de speakers no Studio e Experience.
+- Adicionado sistema de Motion Typography na Experience.
+- Corrigido launcher para suportar escolha de acesso LAN (segurança).
+- Implementada persistência de texto e voz via localStorage.
+- Corrigida renderização do Studio (não trava mais se modelo não estiver carregado).
+
+27. FUNCIONALIDADES AINDA QUEBRADAS
+- Cancelamento de job em tempo real (Runtime interrompe, mas GPU pode continuar processando o kernel atual).
+
+28. FUNCIONALIDADES PARCIAIS
+- Estimativa de tempo (Baseada em RTF médio, precisa de mais dados históricos).
+
+29. RISCOS TÉCNICOS
+VRAM no limite em FP32 (4.01 GB). Risco de OOM se o Windows usar muita memória de vídeo.
+
+30. DÉBITOS TÉCNICOS
+Necessidade de refatoração do CSS para usar Grid em vez de posicionamento absoluto em todas as cenas.
+
+31. O QUE ESTÁ FUNCIONANDO
+- Todo o pipeline de geração e conversão local.
+
+32. O QUE NÃO ESTÁ FUNCIONANDO
+- Preview de voz (áudio de exemplo) no seletor.
+
+33. O QUE PRECISA SER FEITO DEPOIS
+- Refinamento de motion design (easing curves).
+- Waveform visualizer real (Canvas).
+
+34. CHECKLIST FINAL
+[X] Launcher inicia? Sim.
+[X] Navegador abre? Sim.
+[X] Geração local? Sim.
+[X] MP3 funciona? Sim.
+[X] Persistência? Sim.
