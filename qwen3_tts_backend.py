@@ -240,15 +240,6 @@ EventListener = Callable[[BackendEvent], None]
 # ================================================================
 
 def normalize(value: Any) -> str:
-    """
-    Normaliza texto de entrada para reduzir problemas de capitalização
-    e espaços.
-
-    Exemplo:
-        "  QwEn 1.7B CUSTOMVOICE  "
-        ->
-        "qwen 1.7b customvoice"
-    """
     if value is None:
         return ""
 
@@ -392,9 +383,6 @@ def print_gpu_info(label: str = "GPU") -> None:
 # ================================================================
 
 def cleanup_memory() -> None:
-    """
-    Limpeza agressiva, mas segura, depois de descarregar.
-    """
     gc.collect()
 
     try:
@@ -468,10 +456,6 @@ def _is_snapshot_complete(path: Path) -> bool:
 
 
 def find_hf_snapshot(repo_id: str) -> Optional[Path]:
-    """
-    Localiza um snapshot válido no cache do Hugging Face para um repo_id,
-    priorizando o commit apontado por refs/main.
-    """
     cache_dir = get_hf_cache_dir()
     repo_folder_name = f"models--{repo_id.replace('/', '--')}"
     repo_path = cache_dir / repo_folder_name
@@ -533,10 +517,6 @@ def is_model_downloaded(model_key: str) -> bool:
 
 
 def model_source(model_key: str) -> str:
-    """
-    Determina a fonte de carregamento prioritária.
-    Retorna o caminho local ou o repo_id da nuvem.
-    """
     # Prioridade 1: ./models (Cache explícito do backend)
     path = local_model_path(model_key)
     if _is_snapshot_complete(path):
@@ -2432,3 +2412,8 @@ if __name__ == "__main__":
             pass
 
         raise
+
+# Isso foi gerado por IA, o meu trabalho foi pesquisar, e insistir por um grande tempo para TODOS modelos funcionarem com uma tolerancia maior
+# Não garanto que funcione em todos computadores
+# Recomendo fortemente: 4GB DE VRAM, no modelo 0.6B, e 8GB DE VRAM no modelo 1.7B, para que funcione de forma aceitavel
+# Vocês podem brincar com esse script se quiser, sejam felizes!
