@@ -1,0 +1,27 @@
+# Qwen3-TTS Local Studio - Dependências Oficiais
+# Python 3.12+ Recomendado
+
+# Core ML
+torch==2.5.1+cu121
+torchaudio==2.5.1+cu121
+transformers==4.57.3
+accelerate==1.12.0
+bitsandbytes==0.50.0
+qwen-tts==0.1.1
+einops==0.8.2
+safetensors==0.8.0
+
+# API & Web Server
+fastapi==0.136.3
+uvicorn==0.48.0
+jinja2==3.1.6
+python-multipart==0.0.32
+websockets==16.0
+
+# Áudio & Utilitários
+soundfile==0.14.0
+librosa==0.11.0
+qrcode==8.2
+pillow==12.2.0
+
+# Nota: requer FFmpeg instalado localmente em tools/ffmpeg/ ou no PATH.

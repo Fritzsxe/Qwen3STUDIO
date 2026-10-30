@@ -1,0 +1,26 @@
+QWEN3-TTS LOCAL STUDIO - FRONTEND FIX REPORT
+==========================================
+
+PROBLEMA OBSERVADO:
+Tela preta após o Splash/Loading. Interface inacessível.
+
+CAUSA RAIZ CONFIRMADA:
+Mismatch de IDs entre index.html (prefixo scene-) e app.js (nomes puros).
+O switchScene tentava ativar IDs que não existiam, resultando em todas as cenas invisíveis (opacity 0 + visibility hidden).
+
+CORREÇÃO APLICADA:
+1. Unificação de IDs no index.html: removido prefixo 'scene-' de 'experience', 'studio' e 'mobile'.
+2. Lógica de Display Robusta: switchScene agora gerencia explicitamente 'display: none' e 'display: flex' para garantir que os elementos ocupem espaço físico antes da animação de opacidade.
+3. Proteção de Dados: Adicionado tratamento de erros (null checks e default values) na formatação de dados de GPU vindo do WebSocket, prevenindo quebra do script JS.
+4. Recuperação de Estado: Adicionado fallback automático para 'mode-selection' caso o ID salvo no Persistence não seja encontrado no DOM.
+
+TESTES REALIZADOS:
+1. Verificação de IDs no HTML vs Chamadas no JS (Alinhados).
+2. Simulação de reconexão com dados de GPU parciais (Protegido).
+3. Teste de fluxo de transição Splash -> Mode Selection (Validado logicamente).
+
+RESULTADO ESPERADO:
+Ao abrir a aplicação, o Splash concluirá corretamente e a tela de seleção de modo aparecerá. Ao clicar em um modo, a interface do modo escolhido será montada e exibida sem falha de renderização.
+
+ERROS RESTANTES:
+Nenhum bloqueador de visibilidade identificado.

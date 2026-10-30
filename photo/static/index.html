@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QWEN3STUDIO · Ferramenta Criativa de Síntese de Voz</title>
+    <meta name="description" content="QWEN3STUDIO: Áudio, Sinal, Movimento, Precisão e Editorial Motion Design para Síntese Vocal Local.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/prototype.css">
+</head>
+<body>
+
+    <!-- 1. BACKGROUND MULTICAMADAS COM ÁREA SEGURA (POINTER-EVENTS: NONE) -->
+    <div id="visual-canvas" aria-hidden="true">
+        <!-- Camada FAR: Formas profundas, névoa escura e linhas de sinal abstratas -->
+        <div class="ambient-layer layer-far" id="bg-layer-far">
+            <div class="ambient-glow glow-1"></div>
+            <div class="ambient-glow glow-2"></div>
+            <div class="ambient-grid-lines"></div>
+        </div>
+
+        <!-- Camada MID: Telemetria e mini-sinais periféricos (estritamente nas bordas laterais) -->
+        <div class="ambient-layer layer-mid" id="bg-layer-mid">
+            <div class="ambient-signal signal-left">
+                <span class="signal-dot"></span>
+                <span class="signal-text">SIG.24K · LOSSLESS BUFFER</span>
+            </div>
+            <div class="ambient-signal signal-right">
+                <span class="signal-text">LOCAL RUNTIME · FP32</span>
+                <span class="signal-dot"></span>
+            </div>
+            <div class="ambient-mini-player" id="ambient-mini-player">
+                <div class="amp-icon">◈</div>
+                <div class="amp-data">
+                    <span class="amp-title">AUDIOSIGNAL // MONITOR</span>
+                    <span class="amp-sub">0.00 dB · 24000 Hz</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camada NEAR: Linhas milimétricas e marcas de precisão técnica -->
+        <div class="ambient-layer layer-near" id="bg-layer-near">
+            <div class="tech-crosshair ch-tl">+</div>
+            <div class="tech-crosshair ch-tr">+</div>
+            <div class="tech-crosshair ch-bl">+</div>
+            <div class="tech-crosshair ch-br">+</div>
+        </div>
+    </div>
+
+    <!-- 2. BARRA DE NAVEGAÇÃO GLOBAL (PILL COM INDICADOR ELÁSTICO DASH) -->
+    <header class="global-header">
+        <div class="brand-badge" onclick="navigateTo('welcome')">
+            <span class="brand-symbol">◈</span>
+            <span class="brand-name">QWEN3<span class="brand-thin">STUDIO</span></span>
+            <span class="brand-tag">v3.2 PRO</span>
+        </div>
+
+        <nav class="nav-pill" id="global-nav">
+            <div class="nav-indicator-dash" id="nav-indicator"></div>
+            <button type="button" class="nav-item active" data-mode="experience" onclick="switchMode('experience')">Experience</button>
+            <button type="button" class="nav-item" data-mode="studio" onclick="switchMode('studio')">Studio</button>
+            <button type="button" class="nav-item" data-mode="mobile" onclick="switchMode('mobile')">Mobile</button>
+        </nav>
+
+        <div class="header-telemetry">
+            <div class="telemetry-pill">
+                <span class="status-indicator"></span>
+                <span class="telemetry-text">GTX 1650 · FP32 LOCAL</span>
+            </div>
+            <button type="button" class="btn-history-trigger" onclick="toggleHistory(true)" title="Ver histórico recente">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>HISTÓRICO</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 3. WORKSPACE PRINCIPAL -->
+    <main id="app-workspace">
+
+        <!-- ======================================================== -->
+        <!-- MODO EXPERIENCE: JORNADA CINEMÁTICA EDITORIAL            -->
+        <!-- ======================================================== -->
+        <div id="experience-container" class="mode-view active">
+
+            <!-- CENA 01: SPLASH -->
+            <section id="scene-splash" class="scene active">
+                <div class="splash-composition">
+                    <div class="splash-signal-indicator">
+                        <span class="pulse-beam"></span>
+                        <span class="splash-code">AUDIO · SIGNAL · MOTION · PRECISION</span>
+                    </div>
+                    <div class="splash-logo-wrap">
+                        <h1 class="splash-main-title">QWEN3<span class="light-text">STUDIO</span></h1>
+                        <p class="splash-sub-title" id="splash-sub">LOCAL NEURAL VOICE ENGINE</p>
+                    </div>
+                    <div class="splash-loader-bar">
+                        <div class="splash-loader-progress" id="splash-progress"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENA 02: WELCOME (ENTRADA / ATMOSFERA) -->
+            <section id="scene-welcome" class="scene">
+                <div class="welcome-composition safe-zone">
+                    <div class="editorial-badge">
+                        <span class="badge-dot"></span>
+                        <span>SÍNTESE VOCAL LOCAL</span>
+                    </div>
+                    <div class="living-typography-wrapper">
+                        <h1 class="living-text-headline" id="welcome-title"></h1>
+                    </div>
+                    <p class="editorial-sub" id="welcome-subtitle"></p>
+                    <div class="welcome-actions">
+                        <button type="button" class="btn-dash-primary" onclick="navigateTo('voice-gallery')">
+                            <span>INICIAR JORNADA</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                        <button type="button" class="btn-dash-ghost" onclick="switchMode('studio')">
+                            <span>MODO STUDIO DIRETO</span>
+                        </button>
+                    </div>
+                    <div class="welcome-specs">
+                        <div class="spec-node"><span class="spec-label">ARQUITETURA</span><span class="spec-val">Qwen3-TTS 0.6B / 1.7B</span></div>
+                        <div class="spec-divider">/</div>
+                        <div class="spec-node"><span class="spec-label">RESOLUÇÃO</span><span class="spec-val">24 kHz High-Fi</span></div>
+                        <div class="spec-divider">/</div>
+                        <div class="spec-node"><span class="spec-label">EXECUÇÃO</span><span class="spec-val">100% On-Device</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENA 03: VOICE GALLERY (EXPLORAÇÃO / DENSIDADE PROFISSIONAL) -->
+            <section id="scene-voice-gallery" class="scene">
+                <div class="gallery-wrapper safe-zone">
+                    <header class="section-editorial-header">
+                        <div class="section-tag">GALERIA DE TIMBRES</div>
+                        <h2 class="section-title" id="gallery-title">Selecione a identidade vocal</h2>
+                        <p class="section-description" id="gallery-sub">Cada modelo carrega nuances harmônicas, entonação e dinâmica de presença específicas.</p>
+                    </header>
+
+                    <div class="voice-cards-grid" id="voice-cards-grid">
+                        <!-- Cards injetados via JavaScript com densidade e preview -->
+                    </div>
+
+                    <footer class="scene-footer-controls">
+                        <button type="button" class="btn-dash-ghost" onclick="navigateTo('welcome')">
+                            <span>← VOLTAR</span>
+                        </button>
+                        <div class="selection-pill" id="selected-voice-summary">
+                            <span class="pill-label">VOZ ATIVA:</span>
+                            <span class="pill-value" id="gallery-active-voice-name">Vivian</span>
+                        </div>
+                        <button type="button" class="btn-dash-primary" onclick="navigateTo('language')">
+                            <span>DEFINIR IDIOMA</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- CENA 04: LANGUAGE WALL (PAREDE ORGANIZADA DE IDIOMAS) -->
+            <section id="scene-language" class="scene">
+                <div class="language-wrapper safe-zone">
+                    <header class="section-editorial-header">
+                        <div class="section-tag">COMPATIBILIDADE MULTILINGUE</div>
+                        <h2 class="section-title" id="lang-title">Em qual idioma o timbre deve soar?</h2>
+                        <p class="section-description" id="lang-sub">O modelo adapta fonemas e entonação natural para preservar a clareza e ritmo original.</p>
+                    </header>
+
+                    <!-- Filtros Rápidos de Idioma -->
+                    <div class="lang-filter-bar" id="lang-filters">
+                        <button type="button" class="filter-chip active" data-filter="all">TODOS (12)</button>
+                        <button type="button" class="filter-chip" data-filter="popular">PRINCIPAIS</button>
+                        <button type="button" class="filter-chip" data-filter="americas">AMÉRICAS</button>
+                        <button type="button" class="filter-chip" data-filter="europe">EUROPA</button>
+                        <button type="button" class="filter-chip" data-filter="asia">ÁSIA</button>
+                    </div>
+
+                    <div class="language-wall-grid" id="language-wall-grid">
+                        <!-- Mosaico denso e organizado gerado via JavaScript -->
+                    </div>
+
+                    <footer class="scene-footer-controls">
+                        <button type="button" class="btn-dash-ghost" onclick="navigateTo('voice-gallery')">
+                            <span>← GALERIA</span>
+                        </button>
+                        <div class="selection-pill">
+                            <span class="pill-label">IDIOMA:</span>
+                            <span class="pill-value" id="lang-active-summary">Português (Brasil)</span>
+                        </div>
+                        <button type="button" class="btn-dash-primary" onclick="navigateTo('text-editor')">
+                            <span>PROSEGUIR PARA TEXTO</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- CENA 05: TEXT EDITOR (INSTRUMENTO VISUAL / CONCENTRAÇÃO) -->
+            <section id="scene-text-editor" class="scene">
+                <div class="editor-wrapper safe-zone">
+                    <header class="section-editorial-header">
+                        <div class="section-tag">EDITOR INSTRUMENTAL</div>
+                        <h2 class="section-title" id="editor-title">O que esta voz vai materializar?</h2>
+                        <p class="section-description" id="editor-sub">Escreva livremente ou utilize um dos cartuchos editoriais selecionados.</p>
+                    </header>
+
+                    <!-- Container Instrumental Real -->
+                    <div class="instrument-editor-card">
+                        <div class="instrument-header">
+                            <div class="instrument-tags">
+                                <span class="inst-tag" id="exp-tag-voice">🎙️ Vivian</span>
+                                <span class="inst-tag" id="exp-tag-lang">🌐 Português</span>
+                                <span class="inst-tag inst-tag-codec">24.0 kHz · FP32</span>
+                            </div>
+                            
+                            <!-- Cartuchos de Frases Rápidas -->
+                            <div class="phrase-cartridges">
+                                <span class="cartridge-label">CARTUCHOS:</span>
+                                <button type="button" class="btn-cartridge" onclick="loadCartridge('narrativa')">Narrativa</button>
+                                <button type="button" class="btn-cartridge" onclick="loadCartridge('documentario')">Documentário</button>
+                                <button type="button" class="btn-cartridge" onclick="loadCartridge('audiobook')">Audiobook</button>
+                                <button type="button" class="btn-cartridge" onclick="loadCartridge('comercial')">Comercial</button>
+                            </div>
+                        </div>
+
+                        <div class="instrument-body">
+                            <textarea id="exp-textarea" class="instrument-textarea" placeholder="Digite ou cole aqui o texto a ser sintetizado..." spellcheck="false" oninput="handleExpTextChange()"></textarea>
+                        </div>
+
+                        <div class="instrument-footer">
+                            <div class="telemetry-readout">
+                                <div class="readout-item">
+                                    <span class="readout-label">CARACTERES:</span>
+                                    <span class="readout-val" id="exp-chars-count">0 / 2000</span>
+                                </div>
+                                <div class="readout-item">
+                                    <span class="readout-label">ESTIMATIVA:</span>
+                                    <span class="readout-val" id="exp-dur-estimate">≈ 0.0s</span>
+                                </div>
+                                <div class="readout-item">
+                                    <span class="readout-label">LATÊNCIA RTF:</span>
+                                    <span class="readout-val">≈ 0.28x</span>
+                                </div>
+                            </div>
+
+                            <div class="instrument-actions">
+                                <button type="button" class="btn-dash-ghost" onclick="clearExpEditor()">LIMPAR</button>
+                                <button type="button" class="btn-dash-primary btn-synthesize-main" onclick="startGenerationFlow()">
+                                    <span class="btn-pulse-dot"></span>
+                                    <span>SINTETIZAR SINAL</span>
+                                    <span class="btn-arrow">→</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="scene-footer-controls">
+                        <button type="button" class="btn-dash-ghost" onclick="navigateTo('language')">
+                            <span>← IDIOMA</span>
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- CENA 06: GENERATING (TENSÃO / PROCESSAMENTO NEURAL) -->
+            <section id="scene-generating" class="scene">
+                <div class="generating-wrapper safe-zone">
+                    <div class="neural-processing-box">
+                        <div class="processing-phase-badge" id="gen-phase-badge">ETAPA 1/3 · ANÁLISE FONÉTICA</div>
+                        
+                        <!-- Visualizador de Barras de Frequência Neural -->
+                        <div class="neural-spectrum-container" id="neural-spectrum">
+                            <!-- Barras geradas e animadas via CSS/JS -->
+                        </div>
+
+                        <div class="progress-number-wrap">
+                            <div class="progress-big-number" id="gen-big-percentage">0%</div>
+                            <div class="progress-detail" id="gen-detail-status">Inicializando pesos neurais...</div>
+                        </div>
+
+                        <div class="processing-steps-tracker">
+                            <div class="step-node active" id="step-node-1">
+                                <div class="step-circle">1</div>
+                                <div class="step-name">Tokenização</div>
+                            </div>
+                            <div class="step-line" id="step-line-1"></div>
+                            <div class="step-node" id="step-node-2">
+                                <div class="step-circle">2</div>
+                                <div class="step-name">Mel-Spectrogram</div>
+                            </div>
+                            <div class="step-line" id="step-line-2"></div>
+                            <div class="step-node" id="step-node-3">
+                                <div class="step-circle">3</div>
+                                <div class="step-name">Vocoder 24kHz</div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-cancel-generation" onclick="cancelGenerationFlow()">
+                            <span>CANCELAR PROCESSAMENTO</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENA 07: RESULT (RECOMPENSA / CLAREZA / EXPORTAÇÃO) -->
+            <section id="scene-result" class="scene">
+                <div class="result-wrapper safe-zone">
+                    <header class="section-editorial-header">
+                        <div class="section-tag section-tag-success">SÍNTESE CONCLUÍDA</div>
+                        <h2 class="section-title" id="result-title">Sinal acústico gerado com precisão</h2>
+                        <p class="section-description" id="result-sub">O áudio está pronto para audição com alta fidelidade, análise espectral e exportação.</p>
+                    </header>
+
+                    <!-- Player Principal com Estabelecimento de Posição DASH -->
+                    <div class="result-master-player dash-settle" id="result-player-container">
+                        <div class="player-top-meta">
+                            <div class="playback-voice-meta">
+                                <span class="p-voice-name" id="res-voice-name">Vivian</span>
+                                <span class="p-voice-lang" id="res-voice-lang">Português · 24kHz</span>
+                            </div>
+                            <div class="playback-timer" id="res-player-timer">00:00 / 00:08</div>
+                        </div>
+
+                        <!-- Waveform Interativa Visual com Scrubber -->
+                        <div class="interactive-waveform-container" id="interactive-waveform" onclick="seekWaveform(event)">
+                            <div class="waveform-bars" id="waveform-bars">
+                                <!-- Barras de onda estilizadas geradas dinamicamente -->
+                            </div>
+                            <div class="waveform-progress-overlay" id="waveform-progress"></div>
+                            <div class="waveform-scrubber" id="waveform-scrubber"></div>
+                        </div>
+
+                        <!-- Controles de Transporte e Métricas -->
+                        <div class="player-controls-row">
+                            <button type="button" class="btn-play-pause" id="btn-master-play" onclick="toggleMasterPlay()" title="Reproduzir / Pausar">
+                                <span class="play-icon" id="master-play-icon">▶</span>
+                            </button>
+
+                            <div class="result-metrics-grid">
+                                <div class="res-metric-pill">
+                                    <span class="rm-lbl">DURAÇÃO</span>
+                                    <span class="rm-val" id="res-metric-dur">8.42s</span>
+                                </div>
+                                <div class="res-metric-pill">
+                                    <span class="rm-lbl">LATÊNCIA RTF</span>
+                                    <span class="rm-val" id="res-metric-rtf">0.24x</span>
+                                </div>
+                                <div class="res-metric-pill">
+                                    <span class="rm-lbl">SAMPLE RATE</span>
+                                    <span class="rm-val">24.0 kHz</span>
+                                </div>
+                                <div class="res-metric-pill">
+                                    <span class="rm-lbl">FORMATO</span>
+                                    <span class="rm-val">Float32 WAV</span>
+                                </div>
+                            </div>
+
+                            <div class="export-popover-anchor">
+                                <button type="button" class="btn-dash-primary" onclick="toggleExportPopover(event)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    <span>EXPORTAR ÁUDIO</span>
+                                </button>
+                                
+                                <!-- Popover de Exportação Discreto e Elegante -->
+                                <div class="export-popover hidden" id="export-popover">
+                                    <div class="export-popover-title">ESCOLHA O FORMATO:</div>
+                                    <button type="button" class="export-opt-btn" onclick="triggerExport('wav')">
+                                        <div class="exp-fmt">WAV Lossless</div>
+                                        <div class="exp-det">24kHz · Áudio Original sem perdas</div>
+                                    </button>
+                                    <button type="button" class="export-opt-btn" onclick="triggerExport('mp3')">
+                                        <div class="exp-fmt">MP3 192k</div>
+                                        <div class="exp-det">Compacto · Ideal para web & streaming</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="scene-footer-controls">
+                        <button type="button" class="btn-dash-ghost" onclick="navigateTo('text-editor')">
+                            <span>← MODIFICAR TEXTO</span>
+                        </button>
+                        <button type="button" class="btn-dash-secondary" onclick="toggleHistory(true)">
+                            <span>VER NO HISTÓRICO</span>
+                        </button>
+                        <button type="button" class="btn-dash-primary" onclick="navigateTo('welcome')">
+                            <span>NOVA GERAÇÃO</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </footer>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- MODO STUDIO: WORKBENCH DE ALTA DENSIDADE PROFISSIONAL    -->
+        <!-- ======================================================== -->
+        <div id="studio-view" class="mode-view">
+            <div class="studio-workbench-layout">
+                
+                <!-- Barra Lateral de Controles e Parâmetros -->
+                <aside class="studio-sidebar-panel">
+                    <div class="sidebar-block">
+                        <label class="control-label" for="studio-model-select">MODELO LOCAL</label>
+                        <select id="studio-model-select" class="studio-pro-select">
+                            <option value="0.6b">Qwen3-TTS 0.6B CustomVoice (Local)</option>
+                            <option value="1.7b">Qwen3-TTS 1.7B High-Fidelity</option>
+                        </select>
+                        <span class="control-hint">Carregado em VRAM local (GTX 1650)</span>
+                    </div>
+
+                    <div class="sidebar-block">
+                        <label class="control-label" for="studio-voice-select">TIMBRE / SPEAKER</label>
+                        <select id="studio-voice-select" class="studio-pro-select" onchange="handleStudioVoiceChange()">
+                            <!-- Preenchido dinamicamente -->
+                        </select>
+                        <div class="voice-preview-pill" onclick="previewStudioVoice()">
+                            <span id="studio-preview-icon">▶</span>
+                            <span>Ouvir amostra do timbre</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-block">
+                        <label class="control-label" for="studio-dtype-select">PRECISÃO (DTYPE)</label>
+                        <select id="studio-dtype-select" class="studio-pro-select">
+                            <option value="float32">Float32 (Máxima Fidelidade)</option>
+                            <option value="float16">Float16 (Equilibrado)</option>
+                            <option value="int8">Int8 bitsandbytes (Low VRAM)</option>
+                        </select>
+                    </div>
+
+                    <div class="sidebar-block">
+                        <div class="slider-header">
+                            <label class="control-label" for="studio-rate-slider">VELOCIDADE DE FALA</label>
+                            <span class="slider-val" id="studio-rate-val">1.0x</span>
+                        </div>
+                        <input type="range" id="studio-rate-slider" min="0.7" max="1.4" step="0.05" value="1.0" class="studio-pro-range" oninput="document.getElementById('studio-rate-val').innerText = this.value + 'x'">
+                    </div>
+
+                    <div class="sidebar-block">
+                        <div class="slider-header">
+                            <label class="control-label" for="studio-temp-slider">TEMPERATURA NEURAL</label>
+                            <span class="slider-val" id="studio-temp-val">0.70</span>
+                        </div>
+                        <input type="range" id="studio-temp-slider" min="0.2" max="1.0" step="0.05" value="0.7" class="studio-pro-range" oninput="document.getElementById('studio-temp-val').innerText = parseFloat(this.value).toFixed(2)">
+                    </div>
+
+                    <div class="sidebar-status-box">
+                        <div class="stat-line"><span class="sl-tag">VRAM USADA:</span><span class="sl-val">2.8 / 4.0 GB</span></div>
+                        <div class="stat-line"><span class="sl-tag">BUFFER:</span><span class="sl-val">24 kHz Lossless</span></div>
+                        <div class="stat-line"><span class="sl-tag">BACKEND:</span><span class="sl-val">Pronto (Simulado)</span></div>
+                    </div>
+                </aside>
+
+                <!-- Área Central de Trabalho do Studio -->
+                <main class="studio-center-workspace">
+                    <div class="studio-editor-box">
+                        <div class="studio-editor-toolbar">
+                            <div class="toolbar-left">
+                                <span class="toolbar-title">COMPOSITOR DE SINAL</span>
+                                <span class="toolbar-sep">|</span>
+                                <span class="toolbar-sub" id="studio-active-info">Vivian · Float32 · 24kHz</span>
+                            </div>
+                            <div class="toolbar-cartridges">
+                                <button type="button" class="btn-studio-chip" onclick="loadStudioCartridge('editorial')">Texto Editorial</button>
+                                <button type="button" class="btn-studio-chip" onclick="loadStudioCartridge('documentario')">Documentário</button>
+                                <button type="button" class="btn-studio-chip" onclick="loadStudioCartridge('tecnico')">Comando Técnico</button>
+                            </div>
+                        </div>
+
+                        <textarea id="studio-pro-textarea" class="studio-pro-textarea" placeholder="Digite ou cole aqui sua composição textual para síntese de alta precisão..." spellcheck="false" oninput="handleStudioTextChange()"></textarea>
+
+                        <div class="studio-editor-footer">
+                            <div class="studio-limit-indicator">
+                                <span class="studio-chars-text" id="studio-chars-display">0 / 2000 chars</span>
+                                <div class="studio-meter-bar">
+                                    <div class="studio-meter-fill" id="studio-meter-fill"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="studio-actions-group">
+                                <button type="button" class="btn-dash-ghost" onclick="clearStudioText()">LIMPAR</button>
+                                <button type="button" class="btn-dash-primary btn-studio-generate" onclick="runStudioGeneration()">
+                                    <span class="btn-pulse-dot"></span>
+                                    <span>SINTETIZAR SINAL</span>
+                                    <span class="btn-arrow">→</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dock de Saída / Player do Studio (Surge suavemente após a geração) -->
+                    <div class="studio-dock-player hidden" id="studio-dock-player">
+                        <div class="dock-player-left">
+                            <button type="button" class="btn-dock-play" id="btn-dock-play" onclick="toggleDockPlay()">▶</button>
+                            <div class="dock-meta">
+                                <div class="dock-title" id="dock-item-title">Sinal Sintetizado com Sucesso</div>
+                                <div class="dock-specs" id="dock-item-specs">Duração: 6.8s · RTF: 0.26x · 24 kHz WAV</div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Waveform do Studio -->
+                        <div class="dock-waveform" id="dock-waveform" onclick="seekDockWaveform(event)">
+                            <div class="dock-waveform-bars" id="dock-waveform-bars"></div>
+                            <div class="dock-waveform-fill" id="dock-waveform-fill"></div>
+                        </div>
+
+                        <div class="dock-player-actions">
+                            <button type="button" class="btn-dash-ghost btn-sm" onclick="triggerExport('wav')">WAV</button>
+                            <button type="button" class="btn-dash-ghost btn-sm" onclick="triggerExport('mp3')">MP3</button>
+                            <button type="button" class="btn-dock-close" onclick="closeDockPlayer()">✕</button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- MODO MOBILE: ADAPTAÇÃO DEDICADA DA COMPOSIÇÃO            -->
+        <!-- ======================================================== -->
+        <div id="mobile-view" class="mode-view">
+            <div class="mobile-simulator-stage">
+                
+                <!-- Mockup de Dispositivo Móvel Ergonômico -->
+                <div class="mobile-device-frame">
+                    <!-- Status Bar Mobile -->
+                    <div class="mobile-status-bar">
+                        <span class="mobile-time">23:59</span>
+                        <div class="mobile-notch"></div>
+                        <div class="mobile-icons">
+                            <span>5G</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <!-- Header da App Mobile -->
+                    <div class="mobile-app-header">
+                        <div class="m-brand">QWEN3<span class="m-brand-sub">STUDIO</span></div>
+                        <button type="button" class="m-history-btn" onclick="toggleHistory(true)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Conteúdo Scrollável Mobile -->
+                    <div class="mobile-scrollable-content">
+                        <!-- Carrossel Compacto de Vozes -->
+                        <div class="m-section-label">TIMBRE ATIVO</div>
+                        <div class="mobile-voice-carousel" id="mobile-voice-carousel">
+                            <!-- Injetado dinamicamente -->
+                        </div>
+
+                        <!-- Editor Móvel com Bordas Visuais Claras -->
+                        <div class="m-section-label">TEXTO A SINTETIZAR</div>
+                        <div class="mobile-editor-card">
+                            <textarea id="mobile-textarea" class="mobile-textarea" placeholder="Escreva sua mensagem para a voz sintetizar..." oninput="handleMobileTextChange()"></textarea>
+                            <div class="mobile-editor-meta">
+                                <span id="mobile-char-count">0 / 2000</span>
+                                <span id="mobile-dur-est">≈ 0.0s</span>
+                            </div>
+                        </div>
+
+                        <!-- Cartuchos Rápidos Mobile -->
+                        <div class="mobile-chips-row">
+                            <button type="button" class="m-chip" onclick="loadMobileCartridge('podcast')">Podcast</button>
+                            <button type="button" class="m-chip" onclick="loadMobileCartridge('mensagem')">Mensagem</button>
+                            <button type="button" class="m-chip" onclick="loadMobileCartridge('poesia')">Poesia</button>
+                        </div>
+
+                        <!-- Mini Player Recente Mobile -->
+                        <div class="mobile-player-card" id="mobile-player-card">
+                            <div class="mp-left">
+                                <button type="button" class="mp-play-btn" id="btn-mobile-play" onclick="toggleMobilePlay()">▶</button>
+                                <div class="mp-info">
+                                    <div class="mp-voice" id="mobile-last-voice">Vivian · 24kHz</div>
+                                    <div class="mp-sub" id="mobile-last-sub">Último sinal gerado</div>
+                                </div>
+                            </div>
+                            <button type="button" class="mp-export-btn" onclick="triggerExport('mp3')">MP3</button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Bar Mobile Fixa -->
+                    <div class="mobile-bottom-bar">
+                        <button type="button" class="btn-mobile-generate" onclick="runMobileGeneration()">
+                            <span class="m-gen-icon">◈</span>
+                            <span>SINTETIZAR AGORA</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 4. DRAWER LATERAL DE HISTÓRICO (ÚLTIMOS 10 RESULTADOS) -->
+    <div class="history-drawer-overlay" id="history-overlay" onclick="toggleHistory(false)"></div>
+    <aside class="history-drawer" id="history-drawer">
+        <header class="history-drawer-header">
+            <div class="hd-title-group">
+                <span class="hd-tag">MEMÓRIA RECENTE</span>
+                <h3 class="hd-title">Histórico de Sínteses</h3>
+                <p class="hd-subtitle">Últimos 10 resultados armazenados no buffer local.</p>
+            </div>
+            <button type="button" class="btn-close-drawer" onclick="toggleHistory(false)" title="Fechar histórico">✕</button>
+        </header>
+
+        <div class="history-items-list" id="history-items-list">
+            <!-- 10 Itens Simulados Injetados via JS -->
+        </div>
+
+        <footer class="history-drawer-footer">
+            <button type="button" class="btn-dash-ghost btn-block" onclick="clearHistorySimulation()">LIMPAR HISTÓRICO</button>
+        </footer>
+    </aside>
+
+    <!-- 5. NOTIFICAÇÕES TOAST DISCRETAS -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- Scripts de Comunicação com Backend e Motor do Sistema -->
+    <script src="js/api.js"></script>
+    <script src="js/websocket.js"></script>
+    <script src="js/prototype.js"></script>
+</body>
+</html>
